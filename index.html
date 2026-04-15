@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Checklist Transferência</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f2f2f7;color:#1c1c1e;min-height:100vh;padding-bottom:40px}
+.topbar{background:#fff;padding:16px 16px 10px;border-bottom:1px solid #e5e5ea;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:17px;font-weight:700;color:#1c1c1e}
+.topbar-sub{font-size:12px;color:#8e8e93;margin-top:2px}
+.prog-bar{height:4px;background:#e5e5ea;border-radius:2px;margin-top:10px;overflow:hidden}
+.prog-fill{height:4px;background:#007AFF;border-radius:2px;width:0%;transition:width .3s}
+.prog-lbl{font-size:11px;color:#8e8e93;text-align:right;margin-top:3px}
+.group{background:#fff;border-radius:12px;margin:12px 14px 0;overflow:hidden}
+.group-title{font-size:11px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.06em;padding:12px 14px 6px;display:flex;align-items:center;gap:7px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.item{border-top:1px solid #f2f2f7}
+.item-top{display:flex;align-items:center;gap:12px;padding:13px 14px 0;cursor:pointer}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid #c7c7cc;background:#fff;flex-shrink:0;position:relative;transition:all .15s}
+.chk.on{background:#34C759;border-color:#34C759}
+.chk.on::after{content:'';position:absolute;left:7px;top:4px;width:8px;height:12px;border:2.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
+.iname{font-size:15px;font-weight:500;color:#1c1c1e;flex:1;line-height:1.3}
+.item-bot{display:flex;align-items:center;gap:8px;padding:10px 14px 13px}
+.qlbl{font-size:13px;color:#8e8e93}
+.qinput{flex:1;height:38px;font-size:16px;font-weight:600;border:1px solid #d1d1d6;border-radius:8px;background:#f9f9f9;color:#1c1c1e;text-align:center;padding:0 8px}
+.qinput:focus{outline:none;border-color:#007AFF;background:#fff}
+.usel{height:38px;font-size:14px;font-weight:500;border:1px solid #d1d1d6;border-radius:8px;background:#f9f9f9;color:#1c1c1e;padding:0 8px;min-width:82px}
+.usel:focus{outline:none;border-color:#007AFF}
+.add-row{display:flex;gap:8px;padding:8px 14px 12px;border-top:1px solid #f2f2f7}
+.ainput{flex:1;height:40px;font-size:14px;border:1.5px dashed #c7c7cc;border-radius:9px;background:#f9f9f9;color:#1c1c1e;padding:0 12px}
+.ainput:focus{outline:none;border-color:#007AFF}
+.abtn{height:40px;width:40px;border-radius:9px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.resp-wrap{background:#fff;border-radius:12px;margin:12px 14px 0;padding:0 14px}
+.resp-row{display:flex;align-items:center;gap:10px;height:50px}
+.resp-lbl{font-size:15px;color:#1c1c1e}
+.rsel{flex:1;font-size:15px;border:none;background:transparent;color:#007AFF;text-align:right;font-weight:500;padding:0}
+.obs-wrap{background:#fff;border-radius:12px;margin:12px 14px 0;padding:12px 14px}
+.obs-lbl{font-size:13px;color:#8e8e93;margin-bottom:6px}
+.obsta{width:100%;height:66px;font-size:15px;border:1px solid #d1d1d6;border-radius:9px;background:#f9f9f9;color:#1c1c1e;padding:9px 12px;resize:none;font-family:inherit}
+.obsta:focus{outline:none;border-color:#007AFF}
+.btns{padding:14px 14px 0;display:flex;flex-direction:column;gap:8px}
+.wbtn{width:100%;height:52px;background:#25D366;border:none;border-radius:14px;color:#fff;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.wbtn:active{opacity:.85}
+.wbtn svg{width:22px;height:22px;fill:#fff;flex-shrink:0}
+.rbtn{width:100%;height:44px;background:#fff;border:1px solid #d1d1d6;border-radius:12px;color:#8e8e93;font-size:15px;cursor:pointer}
+.msgbox{background:#fff;border-radius:12px;margin:12px 14px 0;overflow:hidden}
+.msgbox-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f2f2f7;border-bottom:1px solid #e5e5ea}
+.msgbox-ttl{font-size:14px;font-weight:600}
+.cpbtn{font-size:14px;color:#007AFF;background:none;border:none;cursor:pointer;font-weight:500;padding:4px}
+.msgpre{padding:14px;font-size:12px;line-height:1.8;white-space:pre-wrap;font-family:'Courier New',monospace;word-break:break-word;color:#1c1c1e}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Transferência para estoque</h1>
+  <div class="topbar-sub" id="subDate"></div>
+  <div class="prog-bar"><div class="prog-fill" id="pFill"></div></div>
+  <div class="prog-lbl" id="pLbl">0 de 0 verificados</div>
+</div>
+
+<div class="resp-wrap">
+  <div class="resp-row">
+    <span class="resp-lbl">Responsável</span>
+    <select class="rsel" id="resp">
+      <option value="">Selecionar...</option>
+      <option>Alexandre Barbosa dos Santos</option>
+      <option>Antonio Reinaldo de Souza</option>
+      <option>Eduardo Martins Silva</option>
+      <option>Everton Padilha Siqueira</option>
+      <option>Gustavo Henrique Guidete Alexa</option>
+      <option>Gustavo Oliveira Damascena</option>
+      <option>Henrique de Oliveira Santana</option>
+      <option>Janaina de Jesus Lima</option>
+      <option>Ketly Fernandes da Silva</option>
+      <option>Leticia de Lima Caciano</option>
+      <option>Luiz Augusto Pereira da Silva</option>
+      <option>Luiz Carlos da Silva</option>
+      <option>Marcia Maria Mott</option>
+      <option>Mario Jascziczin</option>
+      <option>Rafael Wudarski</option>
+      <option>Rosivaldo Carlos Alexandre</option>
+      <option>Sayuri Tami Suzuki Silva</option>
+      <option>Walmir da Silva de Oliveira</option>
+      <option>Willian Guilherme Carvalho Mauricio</option>
+    </select>
+  </div>
+</div>
+
+<div id="root"></div>
+
+<div class="obs-wrap">
+  <div class="obs-lbl">Observações</div>
+  <textarea class="obsta" id="obs" placeholder="Alguma ocorrência para registrar?"></textarea>
+</div>
+
+<div class="btns">
+  <button class="wbtn" id="wabtn">
+    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    Enviar via WhatsApp
+  </button>
+  <button class="rbtn" id="resetbtn">Limpar tudo</button>
+</div>
+
+<div id="msgWrap" style="display:none">
+  <div class="msgbox">
+    <div class="msgbox-hdr">
+      <span class="msgbox-ttl">Mensagem gerada</span>
+      <button class="cpbtn" id="cpbtn">Copiar</button>
+    </div>
+    <div class="msgpre" id="msgPre"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  var hoje = new Date();
+  var ds = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+  var ms = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  var dataFmt = ds[hoje.getDay()] + ', ' + hoje.getDate() + ' de ' + ms[hoje.getMonth()] + ' de ' + hoje.getFullYear();
+  document.getElementById('subDate').textContent = 'Logistica - ' + dataFmt;
+
+  var UNITS = {
+    stretch:  ['KG','Sacos','Paletes'],
+    tubos:    ['Un.','Paletes','KG'],
+    resv:     ['KG','Sacos','Paletes'],
+    resr:     ['KG','Sacos','Paletes'],
+    aditivos: ['KG','Sacos','Un.']
+  };
+
+  var SECS = [
+    {id:'stretch',  name:'Stretch',           color:'#185FA5', items:['Jumbo Manual 25','Jumbo Manual 20','Jumbo Manual 30','Repesagem 25','Repesagem 30']},
+    {id:'tubos',    name:'Tubos',              color:'#555553', items:['510x79x10 - 1 KG','510x79x05 - 500g','510x79x14 - 1,4 KG','440x79x10 - 850g']},
+    {id:'resv',     name:'Resinas Virgens',    color:'#3B6D11', items:[]},
+    {id:'resr',     name:'Resinas Recicladas', color:'#854F0B', items:[]},
+    {id:'aditivos', name:'Aditivos',           color:'#993C1D', items:['MB Preto','Dessecante']}
+  ];
+
+  var state  = {};
+  var extras = {};
+
+  SECS.forEach(function(s) {
+    extras[s.id] = [];
+    s.items.forEach(function(l) {
+      state[s.id + '|' + l] = {on: false, qty: '', unit: UNITS[s.id][0]};
+    });
+  });
+
+  function getState(sid, label) {
+    var k = sid + '|' + label;
+    if (!state[k]) state[k] = {on: false, qty: '', unit: UNITS[sid][0]};
+    return state[k];
+  }
+
+  function updateProg() {
+    var keys  = Object.keys(state);
+    var total = keys.length;
+    var done  = 0;
+    keys.forEach(function(k){ if(state[k].on) done++; });
+    var pct = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('pFill').style.width = pct + '%';
+    document.getElementById('pLbl').textContent  = done + ' de ' + total + ' verificados';
+  }
+
+  function buildAll() {
+    var root = document.getElementById('root');
+    root.innerHTML = '';
+
+    SECS.forEach(function(s) {
+      var allItems = s.items.slice().concat(extras[s.id]);
+      var grp = document.createElement('div');
+      grp.className = 'group';
+
+      var gtitle = document.createElement('div');
+      gtitle.className = 'group-title';
+      var dotEl = document.createElement('span');
+      dotEl.className = 'dot';
+      dotEl.style.background = s.color;
+      gtitle.appendChild(dotEl);
+      gtitle.appendChild(document.createTextNode(s.name));
+      grp.appendChild(gtitle);
+
+      allItems.forEach(function(label) {
+        var st    = getState(s.id, label);
+        var units = UNITS[s.id];
+
+        var item = document.createElement('div');
+        item.className = 'item';
+
+        var top = document.createElement('div');
+        top.className = 'item-top';
+
+        var chk = document.createElement('div');
+        chk.className = 'chk' + (st.on ? ' on' : '');
+
+        var iname = document.createElement('span');
+        iname.className = 'iname';
+        iname.textContent = label;
+
+        top.appendChild(chk);
+        top.appendChild(iname);
+        top.addEventListener('click', function() {
+          st.on = !st.on;
+          chk.className = 'chk' + (st.on ? ' on' : '');
+          updateProg();
+        });
+
+        var bot = document.createElement('div');
+        bot.className = 'item-bot';
+
+        var qlbl = document.createElement('span');
+        qlbl.className = 'qlbl';
+        qlbl.textContent = 'Qtd:';
+
+        var qinp = document.createElement('input');
+        qinp.className = 'qinput';
+        qinp.type = 'number';
+        qinp.setAttribute('inputmode','decimal');
+        qinp.min = '0';
+        qinp.placeholder = '0';
+        qinp.value = st.qty;
+        qinp.addEventListener('change', function(){ st.qty = this.value; });
+        qinp.addEventListener('click', function(e){ e.stopPropagation(); });
+
+        var usel = document.createElement('select');
+        usel.className = 'usel';
+        units.forEach(function(u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          if (u === st.unit) opt.selected = true;
+          usel.appendChild(opt);
+        });
+        usel.addEventListener('change', function(){ st.unit = this.value; });
+        usel.addEventListener('click', function(e){ e.stopPropagation(); });
+
+        bot.appendChild(qlbl);
+        bot.appendChild(qinp);
+        bot.appendChild(usel);
+
+        item.appendChild(top);
+        item.appendChild(bot);
+        grp.appendChild(item);
+      });
+
+      var addRow = document.createElement('div');
+      addRow.className = 'add-row';
+      var ainp = document.createElement('input');
+      ainp.className = 'ainput';
+      ainp.type = 'text';
+      ainp.placeholder = '+ Outro item (Enter para adicionar)';
+      var abtn = document.createElement('button');
+      abtn.className = 'abtn';
+      abtn.textContent = '+';
+
+      function doAdd() {
+        var v = ainp.value.trim();
+        if (!v) return;
+        extras[s.id].push(v);
+        state[s.id + '|' + v] = {on: false, qty: '', unit: UNITS[s.id][0]};
+        ainp.value = '';
+        buildAll();
+      }
+      ainp.addEventListener('keydown', function(e){ if(e.key==='Enter'){e.preventDefault();doAdd();} });
+      abtn.addEventListener('click', doAdd);
+
+      addRow.appendChild(ainp);
+      addRow.appendChild(abtn);
+      grp.appendChild(addRow);
+      root.appendChild(grp);
+    });
+
+    updateProg();
+  }
+
+  document.getElementById('wabtn').addEventListener('click', function() {
+    var resp = document.getElementById('resp').value || 'Logistica';
+    var obs  = document.getElementById('obs').value.trim();
+    var lines = [];
+    lines.push('*CHECKLIST DE TRANSFERENCIA*');
+    lines.push('Data: ' + dataFmt);
+    lines.push('Responsavel: ' + resp);
+    lines.push('');
+
+    var temAlgo = false;
+    SECS.forEach(function(s) {
+      var allItems = s.items.slice().concat(extras[s.id]);
+      var marcados = allItems.filter(function(l){
+        var st = getState(s.id,l); return st.on || st.qty;
+      });
+      if (!marcados.length) return;
+      temAlgo = true;
+      lines.push('*' + s.name + '*');
+      marcados.forEach(function(l) {
+        var st   = getState(s.id, l);
+        var tick = st.on ? '[OK]' : '[ ]';
+        var q    = st.qty ? ' - ' + st.qty + ' ' + st.unit : '';
+        lines.push(tick + ' ' + l + q);
+      });
+      lines.push('');
+    });
+
+    if (!temAlgo) { lines.push('(nenhum item marcado)'); lines.push(''); }
+
+    var total = Object.keys(state).length;
+    var done  = Object.keys(state).filter(function(k){ return state[k].on; }).length;
+    lines.push(done + ' de ' + total + ' itens confirmados');
+    if (obs) { lines.push(''); lines.push('Obs: ' + obs); }
+
+    var txt = lines.join('\n');
+    document.getElementById('msgPre').textContent = txt;
+    document.getElementById('msgWrap').style.display = 'block';
+    setTimeout(function(){
+      document.getElementById('msgWrap').scrollIntoView({behavior:'smooth',block:'start'});
+    }, 150);
+    window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+  });
+
+  document.getElementById('cpbtn').addEventListener('click', function() {
+    var txt = document.getElementById('msgPre').textContent;
+    var btn = document.getElementById('cpbtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function(){
+        btn.textContent = 'Copiado!';
+        setTimeout(function(){ btn.textContent = 'Copiar'; }, 2000);
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e){}
+      document.body.removeChild(ta);
+      btn.textContent = 'Copiado!';
+      setTimeout(function(){ btn.textContent = 'Copiar'; }, 2000);
+    }
+  });
+
+  document.getElementById('resetbtn').addEventListener('click', function() {
+    if (!confirm('Limpar todo o preenchimento?')) return;
+    SECS.forEach(function(s){ extras[s.id] = []; });
+    Object.keys(state).forEach(function(k){ state[k] = {on:false, qty:'', unit:state[k].unit}; });
+    document.getElementById('obs').value  = '';
+    document.getElementById('resp').value = '';
+    document.getElementById('msgWrap').style.display = 'none';
+    buildAll();
+  });
+
+  buildAll();
+});
+</script>
+</body>
+</html>
